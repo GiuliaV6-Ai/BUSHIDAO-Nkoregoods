@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nコレ 出展グッズ アイデア募集</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16101f;
+    --bg2:#1f1631;
+    --panel:#271d3c;
+    --panel-2:#2f2447;
+    --line:#3c3057;
+    --ink:#f5eeff;
+    --muted:#a99fc2;
+    --pink:#ff3d81;
+    --pink-soft:#ff7aab;
+    --gold:#ffc83d;
+    --mint:#5fe3c0;
+    --radius:16px;
+    --shadow:0 18px 40px -22px rgba(0,0,0,.8);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:"Zen Kaku Gothic New",system-ui,sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 12% -10%, rgba(255,61,129,.18), transparent 55%),
+      radial-gradient(1000px 500px at 95% 0%, rgba(255,200,61,.12), transparent 50%),
+      linear-gradient(180deg,var(--bg),var(--bg2));
+    background-attachment:fixed;
+    min-height:100vh;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative;
+    border:1px solid var(--line);
+    border-radius:24px;
+    background:
+      linear-gradient(135deg, rgba(255,61,129,.12), rgba(255,200,61,.06)),
+      var(--panel);
+    padding:34px 28px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .hero::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(135deg, rgba(255,255,255,.025) 0 2px, transparent 2px 9px);
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;letter-spacing:.22em;font-weight:700;
+    color:var(--gold);text-transform:uppercase;
+    border:1px solid rgba(255,200,61,.4);
+    padding:6px 12px;border-radius:999px;background:rgba(255,200,61,.07);
+  }
+  h1{
+    font-family:"Dela Gothic One",sans-serif;
+    font-weight:400;
+    font-size:clamp(30px,6vw,52px);
+    line-height:1.12;
+    margin:16px 0 10px;
+    letter-spacing:.01em;
+  }
+  h1 .x{color:var(--pink)}
+  h1 .sparkle{display:inline-block;animation:tw 2.4s ease-in-out infinite}
+  @keyframes tw{0%,100%{transform:scale(1) rotate(0);opacity:1}50%{transform:scale(1.25) rotate(8deg);opacity:.7}}
+  .lede{color:var(--muted);max-width:54ch;margin:0;font-size:15px}
+  .stats{display:flex;gap:22px;margin-top:22px;flex-wrap:wrap}
+  .stat .n{font-family:"Dela Gothic One",sans-serif;font-size:26px;color:var(--ink)}
+  .stat .n.pink{color:var(--pink)}
+  .stat .n.gold{color:var(--gold)}
+  .stat .l{font-size:11px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase}
+
+  /* ---------- Form ---------- */
+  .card{
+    border:1px solid var(--line);
+    background:var(--panel);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+  .form{margin-top:22px;padding:24px}
+  .form h2{font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:18px;margin:0 0 4px}
+  .form .hint{color:var(--muted);font-size:13px;margin:0 0 18px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media(max-width:620px){.grid{grid-template-columns:1fr}}
+  label{display:block;font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--muted);margin:0 0 6px}
+  .field{margin-bottom:14px}
+  input,select,textarea{
+    width:100%;font:inherit;color:var(--ink);
+    background:var(--bg2);border:1px solid var(--line);
+    border-radius:10px;padding:11px 13px;outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  textarea{resize:vertical;min-height:78px}
+  input::placeholder,textarea::placeholder{color:#6f6690}
+  input:focus,select:focus,textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,61,129,.18)}
+  select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 18px,calc(100% - 13px) 18px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+  .btn{
+    font:inherit;font-weight:700;cursor:pointer;border:none;
+    border-radius:11px;padding:13px 22px;color:#1a1020;
+    background:linear-gradient(135deg,var(--gold),#ff9d3d);
+    box-shadow:0 10px 24px -10px rgba(255,157,61,.7);
+    transition:transform .12s, filter .12s;
+  }
+  .btn:hover{filter:brightness(1.05)}
+  .btn:active{transform:translateY(1px) scale(.99)}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
+  .formerr{color:var(--pink-soft);font-size:13px;margin:10px 0 0;min-height:1px}
+
+  /* ---------- Controls ---------- */
+  .controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:32px 0 14px}
+  .controls .title{font-family:"Dela Gothic One",sans-serif;font-size:16px;margin-right:auto}
+  .chip{
+    font:inherit;font-size:13px;font-weight:700;cursor:pointer;
+    border:1px solid var(--line);background:transparent;color:var(--muted);
+    padding:7px 13px;border-radius:999px;transition:all .14s;white-space:nowrap;
+  }
+  .chip:hover{color:var(--ink);border-color:var(--pink)}
+  .chip.on{background:var(--pink);border-color:var(--pink);color:#fff}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .seg button{font:inherit;font-size:13px;font-weight:700;cursor:pointer;border:none;background:transparent;color:var(--muted);padding:7px 14px}
+  .seg button.on{background:var(--panel-2);color:var(--ink)}
+
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+
+  /* ---------- Idea list ---------- */
+  .list{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:620px){.list{grid-template-columns:1fr}}
+  .idea{
+    position:relative;display:flex;gap:0;
+    border:1px solid var(--line);background:var(--panel);
+    border-radius:var(--radius);overflow:hidden;
+    animation:rise .4s ease both;
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .idea .body{padding:18px 18px 16px;flex:1;min-width:0}
+  .tag{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;
+    color:var(--gold);background:rgba(255,200,61,.1);
+    border:1px solid rgba(255,200,61,.32);padding:3px 9px;border-radius:999px;
+  }
+  .idea h3{font-size:17px;font-weight:900;margin:11px 0 6px;word-break:break-word}
+  .idea p{color:var(--muted);font-size:14px;margin:0;word-break:break-word;white-space:pre-wrap}
+  .by{margin-top:12px;font-size:12px;color:#7d7399}
+  .by b{color:var(--pink-soft);font-weight:700}
+  /* vote stub */
+  .stub{
+    flex:0 0 78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    background:var(--panel-2);cursor:pointer;border:none;color:var(--ink);font:inherit;
+    border-left:2px dashed var(--line);position:relative;transition:background .14s;
+  }
+  .stub:hover{background:#39305a}
+  .stub .heart{font-size:20px;line-height:1;transition:transform .2s}
+  .stub .cnt{font-family:"Dela Gothic One",sans-serif;font-size:20px}
+  .stub .lab{font-size:10px;letter-spacing:.12em;color:var(--muted)}
+  .stub.voted{background:linear-gradient(180deg,rgba(255,61,129,.28),rgba(255,61,129,.12))}
+  .stub.voted .heart{transform:scale(1.15)}
+  .stub.voted .cnt{color:var(--pink-soft)}
+  .pop{animation:pop .35s ease}
+  @keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.4)}100%{transform:scale(1)}}
+
+  .empty{text-align:center;color:var(--muted);padding:48px 20px;border:1px dashed var(--line);border-radius:var(--radius)}
+  .empty .big{font-size:34px;margin-bottom:8px}
+  .skeleton{height:150px;border-radius:var(--radius);background:linear-gradient(100deg,var(--panel) 30%,var(--panel-2) 50%,var(--panel) 70%);background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  footer{margin-top:42px;text-align:center;color:#6f6690;font-size:12px}
+  .linkbtn{background:none;border:none;color:#6f6690;text-decoration:underline;cursor:pointer;font:inherit}
+  .linkbtn:hover{color:var(--pink-soft)}
+  .note{background:rgba(95,227,192,.08);border:1px solid rgba(95,227,192,.25);color:var(--mint);font-size:12px;border-radius:10px;padding:9px 13px;margin-top:14px}
+
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">⚔️ Nコレ 出展企画</span>
+    <h1>出展グッズ<br><span class="x">アイデア</span>募集<span class="sparkle">✨</span></h1>
+    <p class="lede">ブースで売りたいグッズのアイデアを投稿しよう。気に入ったアイデアには「推し票」を入れて、人気のグッズを決めよう。</p>
+    <div class="stats">
+      <div class="stat"><div class="n pink" id="s-count">–</div><div class="l">アイデア</div></div>
+      <div class="stat"><div class="n gold" id="s-votes">–</div><div class="l">推し票</div></div>
+      <div class="stat"><div class="n" id="s-top">–</div><div class="l">最多得票</div></div>
+    </div>
+  </header>
+
+  <section class="card form">
+    <h2>アイデアを投稿</h2>
+    <p class="hint">どんなグッズが欲しい？ 思いついたら気軽にどうぞ。</p>
+    <div class="field">
+      <label for="f-title">グッズ名・アイデア <span style="color:var(--pink)">*</span></label>
+      <input id="f-title" maxlength="60" placeholder="例：キャラ全員のアクリルスタンドセット" />
+    </div>
+    <div class="grid">
+      <div class="field">
+        <label for="f-cat">カテゴリ</label>
+        <select id="f-cat">
+          <option>アクリルスタンド</option>
+          <option>缶バッジ</option>
+          <option>キーホルダー</option>
+          <option>Tシャツ・アパレル</option>
+          <option>タオル</option>
+          <option>ステッカー</option>
+          <option>クリアファイル</option>
+          <option>ぬいぐるみ</option>
+          <option>トレカ</option>
+          <option>文房具</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="f-by">投稿者名（任意）</label>
+        <input id="f-by" maxlength="24" placeholder="名無しさん" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-desc">説明・こだわりポイント（任意）</label>
+      <textarea id="f-desc" maxlength="300" placeholder="サイズ感、デザイン、推しポイントなど自由に"></textarea>
+    </div>
+    <button class="btn" id="submit">アイデアを投稿する</button>
+    <p class="formerr" id="formerr"></p>
+  </section>
+
+  <div class="controls">
+    <span class="title">みんなのアイデア</span>
+    <div class="seg" id="sort">
+      <button data-sort="votes" class="on">人気順</button>
+      <button data-sort="new">新着順</button>
+    </div>
+  </div>
+  <div class="filters" id="filters"></div>
+
+  <div class="list" id="list">
+    <div class="skeleton"></div><div class="skeleton"></div>
+  </div>
+
+  <footer>
+    <p>このボードは投稿・投票が全員で共有されます。データは保存され、次回も残ります。</p>
+    <button class="linkbtn" id="reset">すべてのアイデアをリセット</button>
+  </footer>
+</div>
+
+<script>
+const SHARED = true;
+const VOTED_KEY = "ncolle:voted:v1";
+const CATS = ["アクリルスタンド","缶バッジ","キーホルダー","Tシャツ・アパレル","タオル","ステッカー","クリアファイル","ぬいぐるみ","トレカ","文房具","その他"];
+
+let ideas = [];
+let voted = new Set();
+let sortMode = "votes";
+let filterCat = "all";
+
+const $ = s => document.querySelector(s);
+const listEl = $("#list");
+
+function keyName(k){ return typeof k === "string" ? k : (k.key || ""); }
+
+async function loadVoted(){
+  try{ const r = await window.storage.get(VOTED_KEY, false); voted = new Set(r ? JSON.parse(r.value) : []); }
+  catch{ voted = new Set(); }
+}
+async function saveVoted(){
+  try{ await window.storage.set(VOTED_KEY, JSON.stringify([...voted]), false); }catch(e){}
+}
+
+async function loadIdeas(){
+  let keys = [];
+  try{ const res = await window.storage.list("idea:", SHARED); keys = (res && res.keys) ? res.keys : []; }
+  catch(e){ keys = []; }
+  const out = [];
+  for(const k of keys){
+    const name = keyName(k);
+    if(!name) continue;
+    try{ const r = await window.storage.get(name, SHARED); if(r) out.push(JSON.parse(r.value)); }catch(e){}
+  }
+  ideas = out;
+}
+
+async function init(){
+  await loadVoted();
+  await loadIdeas();
+  buildFilters();
+  render();
+}
+
+function buildFilters(){
+  const wrap = $("#filters");
+  const present = new Set(ideas.map(i=>i.category));
+  const cats = ["all", ...CATS.filter(c=>present.has(c))];
+  wrap.innerHTML = "";
+  cats.forEach(c=>{
+    const b = document.createElement("button");
+    b.className = "chip" + (filterCat===c ? " on" : "");
+    b.textContent = c==="all" ? "すべて" : c;
+    b.onclick = ()=>{ filterCat=c; buildFilters(); render(); };
+    wrap.appendChild(b);
+  });
+}
+
+function stats(){
+  const totalVotes = ideas.reduce((a,b)=>a+(b.votes||0),0);
+  const top = ideas.reduce((m,i)=>Math.max(m,i.votes||0),0);
+  $("#s-count").textContent = ideas.length;
+  $("#s-votes").textContent = totalVotes;
+  $("#s-top").textContent = ideas.length ? top : "–";
+}
+
+function render(){
+  stats();
+  let arr = ideas.slice();
+  if(filterCat!=="all") arr = arr.filter(i=>i.category===filterCat);
+  arr.sort(sortMode==="votes"
+    ? (a,b)=> (b.votes-a.votes) || (b.createdAt-a.createdAt)
+    : (a,b)=> b.createdAt-a.createdAt);
+
+  if(arr.length===0){
+    listEl.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div class="big">⚔️</div>
+      ${ideas.length===0 ? "まだアイデアがありません。最初のひとつを投稿しよう！" : "このカテゴリのアイデアはまだありません。"}
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = "";
+  arr.forEach(i=>{
+    const v = voted.has(i.id);
+    const card = document.createElement("article");
+    card.className = "idea";
+    card.innerHTML = `
+      <div class="body">
+        <span class="tag">${esc(i.category)}</span>
+        <h3>${esc(i.title)}</h3>
+        ${i.description ? `<p>${esc(i.description)}</p>` : ""}
+        <div class="by">投稿：<b>${esc(i.author || "名無しさん")}</b></div>
+      </div>
+      <button class="stub ${v?"voted":""}" aria-pressed="${v}" title="推し票を入れる">
+        <span class="heart">${v?"❤️":"🤍"}</span>
+        <span class="cnt">${i.votes||0}</span>
+        <span class="lab">推し</span>
+      </button>`;
+    card.querySelector(".stub").onclick = (e)=>vote(i.id, e.currentTarget);
+    listEl.appendChild(card);
+  });
+}
+
+async function vote(id, btn){
+  const idx = ideas.findIndex(x=>x.id===id);
+  if(idx<0) return;
+  const has = voted.has(id);
+  // optimistic
+  ideas[idx].votes = Math.max(0,(ideas[idx].votes||0) + (has?-1:1));
+  if(has) voted.delete(id); else voted.add(id);
+  const heart = btn.querySelector(".heart");
+  if(heart){ heart.classList.remove("pop"); void heart.offsetWidth; heart.classList.add("pop"); }
+  render();
+  saveVoted();
+  // persist shared count (read-modify-write)
+  try{
+    const r = await window.storage.get(id, SHARED);
+    if(r){ const obj = JSON.parse(r.value); obj.votes = Math.max(0,(obj.votes||0)+(has?-1:1)); await window.storage.set(id, JSON.stringify(obj), SHARED); }
+  }catch(e){}
+}
+
+async function submit(){
+  const title = $("#f-title").value.trim();
+  const err = $("#formerr");
+  if(!title){ err.textContent = "グッズ名・アイデアを入力してください。"; $("#f-title").focus(); return; }
+  err.textContent = "";
+  const btn = $("#submit"); btn.disabled = true; btn.textContent = "投稿中…";
+  const obj = {
+    id: "idea:" + Date.now() + "_" + Math.random().toString(36).slice(2,7),
+    title,
+    category: $("#f-cat").value,
+    description: $("#f-desc").value.trim(),
+    author: $("#f-by").value.trim(),
+    votes: 0,
+    createdAt: Date.now()
+  };
+  try{
+    const res = await window.storage.set(obj.id, JSON.stringify(obj), SHARED);
+    if(!res) throw new Error("save failed");
+    ideas.push(obj);
+    $("#f-title").value = ""; $("#f-desc").value = ""; $("#f-by").value = "";
+    buildFilters(); render();
+  }catch(e){
+    err.textContent = "保存に失敗しました。もう一度お試しください。";
+  }finally{
+    btn.disabled = false; btn.textContent = "アイデアを投稿する";
+  }
+}
+
+async function resetAll(){
+  if(!confirm("すべてのアイデアと投票を削除します。よろしいですか？")) return;
+  try{
+    const res = await window.storage.list("idea:", SHARED);
+    const keys = (res && res.keys) ? res.keys : [];
+    for(const k of keys){ try{ await window.storage.delete(keyName(k), SHARED); }catch(e){} }
+  }catch(e){}
+  voted = new Set(); saveVoted();
+  ideas = []; buildFilters(); render();
+}
+
+function esc(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
+
+$("#submit").onclick = submit;
+$("#f-title").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); $("#f-desc").focus(); }});
+$("#reset").onclick = resetAll;
+document.querySelectorAll("#sort button").forEach(b=>{
+  b.onclick = ()=>{ sortMode=b.dataset.sort; document.querySelectorAll("#sort button").forEach(x=>x.classList.toggle("on", x===b)); render(); };
+});
+
+init();
+</script>
+</body>
+</html>
