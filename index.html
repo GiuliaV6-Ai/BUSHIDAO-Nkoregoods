@@ -177,6 +177,11 @@
   .linkbtn{background:none;border:none;color:#6f6690;text-decoration:underline;cursor:pointer;font:inherit}
   .linkbtn:hover{color:var(--pink-soft)}
   .note{background:rgba(95,227,192,.08);border:1px solid rgba(95,227,192,.25);color:var(--mint);font-size:12px;border-radius:10px;padding:9px 13px;margin-top:14px}
+  .note.ok{background:rgba(95,227,192,.08);border-color:rgba(95,227,192,.25);color:var(--mint)}
+  .note.warn{background:rgba(255,200,61,.08);border-color:rgba(255,200,61,.3);color:var(--gold)}
+  .foot-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0}
+  .ghost{font:inherit;font-size:13px;font-weight:700;cursor:pointer;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 16px;transition:border-color .14s,color .14s}
+  .ghost:hover{border-color:var(--pink);color:var(--pink-soft)}
 
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -246,7 +251,12 @@
   </div>
 
   <footer>
-    <p>このボードは投稿・投票が全員で共有されます。データは保存され、次回も残ります。</p>
+    <p id="foot-status" class="note ok">読み込み中…</p>
+    <div class="foot-actions">
+      <button class="ghost" id="export">データを書き出す（バックアップ）</button>
+      <button class="ghost" id="import-btn">ファイルから読み込む</button>
+      <input type="file" id="import-file" accept="application/json,.json" hidden>
+    </div>
     <button class="linkbtn" id="reset">すべてのアイデアをリセット</button>
   </footer>
 </div>
@@ -266,32 +276,105 @@ const listEl = $("#list");
 
 function keyName(k){ return typeof k === "string" ? k : (k.key || ""); }
 
-async function loadVoted(){
-  try{ const r = await window.storage.get(VOTED_KEY, false); voted = new Set(r ? JSON.parse(r.value) : []); }
-  catch{ voted = new Set(); }
-}
-async function saveVoted(){
-  try{ await window.storage.set(VOTED_KEY, JSON.stringify([...voted]), false); }catch(e){}
+/* ---- storage layer: cloud(shared) -> localStorage(device) -> memory ---- */
+const mem = new Map();      // session fallback store
+let backend = "memory";     // "cloud" | "local" | "memory"
+
+async function probeStorage(){
+  // tier 1: Claude shared storage (cross-session, shared by everyone)
+  if(typeof window !== "undefined" && window.storage){
+    try{
+      await window.storage.set("ncolle:__probe__", "ok", SHARED);
+      await window.storage.delete("ncolle:__probe__", SHARED);
+      backend = "cloud"; return;
+    }catch(e){}
+  }
+  // tier 2: browser localStorage (survives reload/close on this device)
+  try{
+    localStorage.setItem("ncolle:__probe__", "ok");
+    localStorage.removeItem("ncolle:__probe__");
+    backend = "local"; return;
+  }catch(e){}
+  // tier 3: in-memory only
+  backend = "memory";
 }
 
+function degrade(){ if(backend !== "memory"){ backend = "memory"; updateStatus(); } }
+
+async function sGet(key, shared){
+  if(backend === "cloud"){
+    try{ const r = await window.storage.get(key, shared); return (r && r.value!=null) ? r.value : null; }catch(e){}
+    return mem.has(key) ? mem.get(key) : null;
+  }
+  if(backend === "local"){
+    try{ return localStorage.getItem("nc:" + key); }catch(e){}
+  }
+  return mem.has(key) ? mem.get(key) : null;
+}
+async function sSet(key, value, shared){
+  mem.set(key, value);                         // always keep a session copy
+  if(backend === "cloud"){ try{ await window.storage.set(key, value, shared); }catch(e){ degrade(); } }
+  else if(backend === "local"){ try{ localStorage.setItem("nc:" + key, value); }catch(e){ degrade(); } }
+  return true;                                 // never hard-fail the UI
+}
+async function sDelete(key, shared){
+  mem.delete(key);
+  if(backend === "cloud"){ try{ await window.storage.delete(key, shared); }catch(e){} }
+  else if(backend === "local"){ try{ localStorage.removeItem("nc:" + key); }catch(e){} }
+}
+async function sListKeys(prefix, shared){
+  if(backend === "cloud"){
+    try{ const r = await window.storage.list(prefix, shared); if(r && r.keys) return r.keys.map(keyName).filter(Boolean); }catch(e){ degrade(); }
+  } else if(backend === "local"){
+    try{
+      const out = [];
+      for(let i=0;i<localStorage.length;i++){ const k = localStorage.key(i); if(k && k.startsWith("nc:"+prefix)) out.push(k.slice(3)); }
+      return out;
+    }catch(e){}
+  }
+  return [...mem.keys()].filter(k => k.startsWith(prefix));
+}
+
+async function loadVoted(){
+  const raw = await sGet(VOTED_KEY, false);
+  voted = new Set(raw ? safeParse(raw, []) : []);
+}
+async function saveVoted(){ await sSet(VOTED_KEY, JSON.stringify([...voted]), false); }
+
 async function loadIdeas(){
-  let keys = [];
-  try{ const res = await window.storage.list("idea:", SHARED); keys = (res && res.keys) ? res.keys : []; }
-  catch(e){ keys = []; }
+  const keys = await sListKeys("idea:", SHARED);
   const out = [];
-  for(const k of keys){
-    const name = keyName(k);
-    if(!name) continue;
-    try{ const r = await window.storage.get(name, SHARED); if(r) out.push(JSON.parse(r.value)); }catch(e){}
+  for(const name of keys){
+    const raw = await sGet(name, SHARED);
+    if(raw){ const obj = safeParse(raw, null); if(obj) out.push(obj); }
   }
   ideas = out;
 }
 
+function safeParse(s, fallback){ try{ return JSON.parse(s); }catch(e){ return fallback; } }
+
+function updateStatus(){
+  const el = $("#foot-status");
+  if(!el) return;
+  if(backend === "cloud"){
+    el.className = "note ok";
+    el.textContent = "✓ 投稿・投票は全員で共有され、保存されます。次回も残ります。";
+  }else if(backend === "local"){
+    el.className = "note ok";
+    el.textContent = "✓ このブラウザに保存されます（リロードや再起動後も残ります／このボードはこの端末用です）。共有や引っ越しは「データを書き出す」を使ってください。";
+  }else{
+    el.className = "note warn";
+    el.textContent = "※ 自動保存が使えない環境です。投稿は画面を閉じると消えます。残すには「データを書き出す」でファイル保存してください。次回は「ファイルから読み込む」で復元できます。";
+  }
+}
+
 async function init(){
+  await probeStorage();
   await loadVoted();
   await loadIdeas();
   buildFilters();
   render();
+  updateStatus();
 }
 
 function buildFilters(){
@@ -366,10 +449,8 @@ async function vote(id, btn){
   render();
   saveVoted();
   // persist shared count (read-modify-write)
-  try{
-    const r = await window.storage.get(id, SHARED);
-    if(r){ const obj = JSON.parse(r.value); obj.votes = Math.max(0,(obj.votes||0)+(has?-1:1)); await window.storage.set(id, JSON.stringify(obj), SHARED); }
-  }catch(e){}
+  const raw = await sGet(id, SHARED);
+  if(raw){ const obj = safeParse(raw, null); if(obj){ obj.votes = Math.max(0,(obj.votes||0)+(has?-1:1)); await sSet(id, JSON.stringify(obj), SHARED); } }
 }
 
 async function submit(){
@@ -388,13 +469,12 @@ async function submit(){
     createdAt: Date.now()
   };
   try{
-    const res = await window.storage.set(obj.id, JSON.stringify(obj), SHARED);
-    if(!res) throw new Error("save failed");
+    await sSet(obj.id, JSON.stringify(obj), SHARED);
     ideas.push(obj);
     $("#f-title").value = ""; $("#f-desc").value = ""; $("#f-by").value = "";
     buildFilters(); render();
   }catch(e){
-    err.textContent = "保存に失敗しました。もう一度お試しください。";
+    err.textContent = "投稿に失敗しました。もう一度お試しください。";
   }finally{
     btn.disabled = false; btn.textContent = "アイデアを投稿する";
   }
@@ -402,20 +482,61 @@ async function submit(){
 
 async function resetAll(){
   if(!confirm("すべてのアイデアと投票を削除します。よろしいですか？")) return;
-  try{
-    const res = await window.storage.list("idea:", SHARED);
-    const keys = (res && res.keys) ? res.keys : [];
-    for(const k of keys){ try{ await window.storage.delete(keyName(k), SHARED); }catch(e){} }
-  }catch(e){}
+  const keys = await sListKeys("idea:", SHARED);
+  for(const k of keys){ await sDelete(k, SHARED); }
   voted = new Set(); saveVoted();
   ideas = []; buildFilters(); render();
 }
 
 function esc(s){ return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m])); }
 
+/* ---- backup: export / import to JSON file ---- */
+function exportData(){
+  const payload = { app:"ncolle-goods-ideas", version:1, exportedAt:new Date().toISOString(), ideas };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const d = new Date(), p = n=>String(n).padStart(2,"0");
+  a.href = url;
+  a.download = `ncolle-ideas_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+
+async function importData(file){
+  const text = await file.text();
+  const data = safeParse(text, null);
+  const incoming = data && Array.isArray(data.ideas) ? data.ideas : (Array.isArray(data) ? data : null);
+  if(!incoming){ alert("読み込めませんでした。書き出したJSONファイルを選んでください。"); return; }
+  const existing = new Set(ideas.map(i=>i.id));
+  let added = 0;
+  for(const it of incoming){
+    if(!it || !it.title) continue;
+    const obj = {
+      id: it.id && String(it.id).startsWith("idea:") ? it.id : ("idea:" + Date.now() + "_" + Math.random().toString(36).slice(2,7)),
+      title: String(it.title).slice(0,60),
+      category: it.category || "その他",
+      description: it.description ? String(it.description).slice(0,300) : "",
+      author: it.author ? String(it.author).slice(0,24) : "",
+      votes: Number(it.votes)||0,
+      createdAt: Number(it.createdAt)||Date.now()
+    };
+    if(existing.has(obj.id)) continue;
+    existing.add(obj.id);
+    ideas.push(obj);
+    await sSet(obj.id, JSON.stringify(obj), SHARED);
+    added++;
+  }
+  buildFilters(); render();
+  alert(added>0 ? `${added}件のアイデアを読み込みました。` : "新しく追加されたアイデアはありませんでした（すでに同じものがあります）。");
+}
+
 $("#submit").onclick = submit;
 $("#f-title").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); $("#f-desc").focus(); }});
 $("#reset").onclick = resetAll;
+$("#export").onclick = exportData;
+$("#import-btn").onclick = ()=>$("#import-file").click();
+$("#import-file").addEventListener("change", e=>{ const f=e.target.files[0]; if(f) importData(f); e.target.value=""; });
 document.querySelectorAll("#sort button").forEach(b=>{
   b.onclick = ()=>{ sortMode=b.dataset.sort; document.querySelectorAll("#sort button").forEach(x=>x.classList.toggle("on", x===b)); render(); };
 });
